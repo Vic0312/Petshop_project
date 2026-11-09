@@ -56,16 +56,16 @@ Exemplos para o filtro de documentos no Compass:
 
 No Compass, o campo `_id` é um `ObjectId`. A API apresenta esse identificador como `id`, em formato de string, para a interface Vue. Campos como `usuario_id`, `animal_id` e `servico_id` também são referências `ObjectId` no banco.
 
-## Contas de demonstração
+## Contas de desenvolvimento
 
-Use os botões na tela de entrada ou estas credenciais fictícias:
+A tela de entrada usa o formulário de e-mail e senha. No ambiente de desenvolvimento, estas contas fictícias estão disponíveis quando a criação de dados de demonstração está habilitada:
 
 | Perfil | E-mail | Senha |
 | --- | --- | --- |
 | Cliente | `cliente@patai.com.br` | `Patai@123` |
 | Administrador | `admin@patai.com.br` | `Patai@123` |
 
-`SEED_DEMO=false` impede a criação de novas contas fictícias e oculta os atalhos; registros existentes são preservados. Para um ambiente vazio sem demonstração, configure `ADMIN_NAME`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` para criar o primeiro administrador. O cadastro público sempre cria clientes.
+`SEED_DEMO=false` impede a criação de novas contas fictícias; registros existentes são preservados. Para um ambiente vazio sem demonstração, configure `ADMIN_NAME`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` para criar o primeiro administrador. O cadastro público sempre cria clientes.
 
 ## Estrutura MVC
 
@@ -168,9 +168,20 @@ Uma fila no processo Node coordena alterações nos horários de funcionamento c
 | Acompanhar seus agendamentos | Aprovar ou recusar solicitações |
 | Cancelar antes do horário marcado | Gerenciar horários da semana |
 | Ver atendimentos e observações | Concluir e registrar atendimentos |
-| Atualizar nome e telefone | Atualizar nome e telefone |
+| Atualizar nome, telefone, e-mail e senha | Atualizar nome, telefone, e-mail e senha |
+| | Cadastrar novos clientes e administradores |
 
 Também há busca, calendário, avisos derivados da agenda e foto opcional dos animais. A recuperação de senha é opcional no escopo e não foi implementada. Não há envio de e-mails ou mensagens nem pagamento online.
+
+### Meu perfil e usuários
+
+Clientes e administradores podem editar nome, celular e e-mail em **Meu perfil**. O botão **Alterar minha senha** abre os campos de nova senha e confirmação. Alterar e-mail ou senha exige a senha atual; atualizar apenas nome ou celular não exige essa confirmação.
+
+A nova senha precisa ter de 8 a 128 caracteres. Após alterar as credenciais, o acesso atual continua funcionando e as outras sessões dessa conta são encerradas. O novo e-mail passa a ser usado no login, com validação para impedir duplicação. O perfil de acesso não pode ser alterado pelo próprio usuário.
+
+Na administração, a página **Usuários** lista as contas com filtros por perfil. Use **Cadastrar usuário** para informar nome, e-mail, celular opcional, perfil **Cliente** ou **Administrador**, senha inicial e confirmação. Esse cadastro mantém a sessão do administrador e utiliza as mesmas proteções de senha do cadastro público. A senha inicial deve ser entregue ao titular pelo administrador; o projeto não envia e-mails automaticamente.
+
+O cadastro público sempre cria clientes. As rotas administrativas `GET /api/usuarios` e `POST /api/usuarios` exigem autenticação como administrador. Nenhuma resposta da API inclui senhas ou seus hashes.
 
 ### Foto do animal
 
@@ -202,7 +213,7 @@ Regras principais:
 
 Os textos principais usam **16 px**, com controles e informações auxiliares de pelo menos **14 px**. Os títulos usam Montserrat e os textos usam Poppins. A escala continua legível no celular, reorganizando os cards, menus, formulários e tabelas em vez de diminuir a fonte.
 
-A entrada e a visão geral usam fundos verdes suaves, navegação ativa em verde escuro e maior contraste nos painéis. O cartão lateral “Carinho na agenda. Alegria na rotina.” aparece somente na área do cliente.
+A entrada e a visão geral usam fundos verdes suaves, navegação ativa em verde escuro e maior contraste nos painéis. A barra lateral mantém um único acesso à ajuda, pelo botão “Precisa de uma patinha?”.
 
 ## Transferir a versão anterior
 
@@ -227,9 +238,11 @@ npm run check
 npm test
 ```
 
-Os **24 testes** usam um banco MongoDB temporário com nome aleatório `patai_test_...` e uma pasta de fotos isolada. Ao terminar, removem apenas os dados criados para o teste; o banco `patai` e as fotos reais permanecem intactos.
+Os **34 testes** usam bancos MongoDB temporários com nomes aleatórios `patai_test_...` e uma pasta de fotos isolada. Ao terminar, removem apenas os dados criados para o teste; o banco `patai` e as fotos reais permanecem intactos.
 
 São verificados autenticação, controle de acesso, isolamento dos tutores, cadastros, validação de documentos, conflitos de horários, duas conexões concorrentes, histórico de valores, disponibilidade, cancelamento, recusa, conclusão atômica e logout. Os testes de fotos cobrem envio, conversão, dimensões, persistência, leitura autorizada, troca, remoção, tipos inválidos, limite de tamanho e limpeza dos arquivos.
+
+Os testes de contas também verificam cadastro administrativo dos dois perfis, troca de e-mail e senha, confirmação da senha atual, encerramento de outras sessões, unicidade de e-mail em operações concorrentes e proteção contra mudança indevida de perfil. Os dados de demonstração não são recriados quando seus titulares mudam o e-mail.
 
 ## Segurança e configuração
 

@@ -22,7 +22,7 @@ export function petshopController(db, models, photos) {
   return {
     async dashboard(req, res) {
       const admin = req.user.tipo === 'admin';
-      res.json({ user: req.user, animais: await animais.list(req.user), servicos: await servicos.list(admin), agendamentos: await agendamentos.list(req.user), horarios: await horarios.list(), clientes: admin ? await usuarios.clients() : [] });
+      res.json({ user: req.user, animais: await animais.list(req.user), servicos: await servicos.list(admin), agendamentos: await agendamentos.list(req.user), horarios: await horarios.list(), clientes: admin ? await usuarios.clients() : [], usuarios: admin ? await usuarios.list() : [] });
     },
     async saveAnimal(req, res) {
       const animalId = req.params.id ? id(req.params.id) : null;

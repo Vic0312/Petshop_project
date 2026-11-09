@@ -14,11 +14,11 @@ export async function seedDatabase(db, demo = process.env.SEED_DEMO !== 'false')
   if (!await servicos.findOne()) await servicos.insertMany(catalog);
   for (let day = 0; day <= 6; day++) await horarios.updateOne({ dia_semana: day }, { $setOnInsert: { dia_semana: day, inicio: '09:00', fim: day === 6 ? '14:00' : '18:00', ativo: day === 0 ? 0 : 1 } }, { upsert: true });
   const now = new Date().toISOString();
-  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD && !await usuarios.findOne({ email: process.env.ADMIN_EMAIL.toLowerCase() })) {
+  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD && !await usuarios.findOne({ tipo: 'admin' })) {
     if (process.env.ADMIN_PASSWORD.length < 8) throw new Error('ADMIN_PASSWORD precisa de pelo menos 8 caracteres.');
     await usuarios.insertOne({ nome: process.env.ADMIN_NAME || 'Administrador', email: process.env.ADMIN_EMAIL.toLowerCase(), senha: await hashPassword(process.env.ADMIN_PASSWORD), telefone: '', tipo: 'admin', criado_em: now });
   }
-  if (!demo || await usuarios.findOne({ email: 'cliente@patai.com.br' })) return;
+  if (!demo || await usuarios.findOne({ tipo: 'cliente' })) return;
   if (!await usuarios.findOne({ email: 'admin@patai.com.br' })) await usuarios.insertOne({ nome: 'Equipe Pataí', email: 'admin@patai.com.br', senha: await hashPassword('Patai@123'), telefone: '(11) 99999-0000', tipo: 'admin', criado_em: now });
   const { insertedId: userId } = await usuarios.insertOne({ nome: 'Mariana Costa', email: 'cliente@patai.com.br', senha: await hashPassword('Patai@123'), telefone: '(11) 98765-4321', tipo: 'cliente', criado_em: now });
   const luna = await animais.insertOne({ usuario_id: userId, nome: 'Luna', especie: 'Cachorro', raca: 'Golden retriever', porte: 'Grande', idade: 3, observacoes: 'Adora carinho e fica mais tranquila com água morna.', foto: 'golden' });

@@ -17,6 +17,7 @@ export function createAuth(usuarios, secure = process.env.NODE_ENV === 'producti
       res.cookie('patai_session', value, { httpOnly: true, secure, sameSite: 'strict', maxAge, path: '/' });
     },
     destroy(req, res) { const value = token(req); if (value) sessions.delete(digest(value)); res.clearCookie('patai_session', { httpOnly: true, secure, sameSite: 'strict', path: '/' }); },
+    invalidateUser(userId) { for (const [key, session] of sessions) if (session.userId === userId) sessions.delete(key); },
     async required(req, res, next) {
       const value = token(req);
       const session = value && sessions.get(digest(value));

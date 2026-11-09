@@ -710,41 +710,6 @@ label {
   text-decoration: underline;
 }
 
-.demo-box {
-  margin-top: 35px;
-  border-top: 1px solid var(--line);
-  padding-top: 25px;
-}
-
-.demo-title {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 14px;
-  letter-spacing: 1.4px;
-  font-weight: 500;
-  color: #79866f;
-}
-
-.demo-box>p {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.8;
-  margin: 9px 0 13px;
-}
-
-.demo-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.demo-actions>.btn {
-  flex: 1;
-  padding: 10px 11px;
-  font-size: 14px;
-  min-height: 38px;
-}
-
 .auth-bottom {
   display: flex;
   align-items: center;
@@ -869,58 +834,6 @@ label {
 .sidebar-bottom {
   margin-top: auto;
   padding-top: 35px;
-}
-
-.sidebar-note {
-  background: var(--cream);
-  border-radius: 13px;
-  padding: 19px 17px 15px;
-  position: relative;
-  overflow: hidden;
-}
-
-.note-doodle {
-  display: block;
-  color: #82986c;
-  margin-bottom: 11px;
-  transform: rotate(-14deg);
-  width: 26px;
-}
-
-.sidebar-note:after {
-  content: '';
-  width: 80px;
-  height: 80px;
-  border: 1px solid #dfe2cc;
-  position: absolute;
-  right: -35px;
-  top: -20px;
-  border-radius: 50%;
-}
-
-.sidebar-note h3 {
-  font-size: 14px;
-  line-height: 1.7;
-  letter-spacing: -.2px;
-}
-
-.sidebar-note p {
-  font-size: 14px;
-  line-height: 1.9;
-  color: #939c82;
-  margin-top: 7px;
-}
-
-.sidebar-note>button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 14px;
-  color: var(--green);
-  margin-top: 15px;
-  padding: 0;
-  font-weight: 500;
 }
 
 .help-link {
@@ -4119,10 +4032,6 @@ label {
   .auth-card form {
     margin-top: 25px;
   }
-  .demo-box {
-    margin-top: 28px;
-    padding-top: 22px;
-  }
   .auth-bottom {
     margin-top: 0;
   }
@@ -4866,16 +4775,6 @@ label {
   .auth-card form {
     gap: 17px;
   }
-  .demo-actions {
-    gap: 9px;
-  }
-  .demo-actions>.btn {
-    font-size: 14px;
-    padding: 10px;
-  }
-  .demo-box>p {
-    font-size: 14px;
-  }
   .auth-bottom {
     font-size: 14px;
   }
@@ -4907,15 +4806,7 @@ label {
   font-size: 14px;
 }
 
-.sidebar-note h3 {
-  font-size: 14px;
-}
-
-.sidebar-note p {
-  font-size: 14px;
-}
-
-.sidebar-note>button,.help-link {
+.help-link {
   font-size: 14px;
 }
 

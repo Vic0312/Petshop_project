@@ -36,7 +36,6 @@
           <button class="btn btn-primary btn-full" :disabled="busy">{{ busy ? 'Só um instante…' : registering ? 'Criar minha conta' : 'Entrar na minha conta' }}<icon name="arrow" :size="18"></icon></button>
         </form>
         <p class="auth-switch">{{ registering ? 'Já faz parte do Pataí?' : 'Primeira vez por aqui?' }} <button @click="registering = !registering; authError = ''">{{ registering ? 'Entrar na conta' : 'Crie sua conta' }}</button></p>
-        <div v-if="demo" class="demo-box"><span class="demo-title"><span class="live-dot"></span> CONHEÇA O PROJETO</span><p>Entre em uma conta de demonstração e explore o Pataí.</p><div class="demo-actions"><button class="btn btn-outline" @click="demoLogin('cliente')" :disabled="busy"><icon name="paw" :size="17"></icon> Sou cliente</button><button class="btn btn-outline" @click="demoLogin('admin')" :disabled="busy"><icon name="shield" :size="17"></icon> Sou administrador</button></div></div>
       </div>
       <div class="auth-bottom">Um pequeno gesto. Uma vida mais feliz. <icon name="heart" :size="14"></icon></div>
     </section>
@@ -48,7 +47,7 @@
       <a href="#inicio" class="brand"><img src="/assets/images/mark.svg" alt="" width="43" height="43"><span>Pataí<span class="brand-dot">.</span><small>cuidado de focinho a rabinho</small></span></a>
       <div class="workspace-label"><span class="live-dot"></span>{{ isAdmin ? 'ÁREA DO ADMINISTRADOR' : 'ÁREA DO CLIENTE' }}</div>
       <nav aria-label="Menu principal"><span class="nav-label">SEU ESPAÇO</span><a v-for="item in navigation" :key="item.id" :href="'#' + item.id" :class="['nav-item', {active: page === item.id}]" @click="sidebarOpen = false; search = ''"><icon :name="item.icon" :size="21"></icon><span>{{ item.label }}</span><span v-if="item.id === 'solicitacoes' && pending.length" class="nav-count">{{ pending.length }}</span><span v-if="page === item.id" class="nav-active-dot"></span></a></nav>
-      <div class="sidebar-bottom"><div v-if="!isAdmin" class="sidebar-note"><span class="note-doodle"><icon name="heart" :size="24"></icon></span><h3>Carinho na agenda.<br>Alegria na rotina.</h3><p>A gente cuida dos detalhes.<br>Você aproveita os lambeijos.</p><button @click="openHelp">Conte com a gente <icon name="arrow" :size="16"></icon></button></div><button class="nav-item help-link" @click="openHelp"><icon name="help" :size="20"></icon> Precisa de uma patinha?</button><button class="account" @click="navigate('perfil')"><span class="user-avatar">{{ initials(user.nome) }}</span><span><strong>{{ firstName }}</strong><small>{{ isAdmin ? 'Administrador' : 'Tutor de muito amor' }}</small></span><icon name="down" :size="16"></icon></button></div>
+      <div class="sidebar-bottom"><button class="nav-item help-link" @click="openHelp"><icon name="help" :size="20"></icon> Precisa de uma patinha?</button><button class="account" @click="navigate('perfil')"><span class="user-avatar">{{ initials(user.nome) }}</span><span><strong>{{ firstName }}</strong><small>{{ isAdmin ? 'Administrador' : 'Tutor de muito amor' }}</small></span><icon name="down" :size="16"></icon></button></div>
     </aside>
 
     <div class="main-shell">
@@ -83,7 +82,48 @@
 
         <template v-else-if="page === 'horarios' && isAdmin"><section class="page-heading"><div><span class="eyebrow">TEMPO PARA CUIDAR</span><h1>Horários de atendimento</h1><p>Defina quando a equipe está pronta para receber mais carinho.</p></div></section><div class="hours-layout"><form class="panel hours-panel" @submit.prevent="saveHours"><div class="section-heading"><div><h2>Uma rotina de bem-estar</h2><p>Os horários disponíveis são calculados pela duração de cada serviço.</p></div><span class="small-icon"><icon name="clock" :size="24"></icon></span></div><div v-for="row in hoursForm" :key="row.dia_semana" :class="['hours-row', {closed: !row.ativo}]"><label class="switch-label"><input type="checkbox" v-model="row.ativo" :aria-label="'Abrir atendimento em ' + weekdayNames[row.dia_semana]"><span class="switch"></span><strong>{{ weekdayNames[row.dia_semana] }}</strong></label><div class="hours-inputs"><template v-if="row.ativo"><input type="time" v-model="row.inicio" step="1800" required :aria-label="'Abertura em ' + weekdayNames[row.dia_semana]"><span>até</span><input type="time" v-model="row.fim" step="1800" required :aria-label="'Fechamento em ' + weekdayNames[row.dia_semana]"></template><span v-else class="closed-label">Um dia de descanso</span></div></div><div class="form-error" role="alert" v-if="formError">{{ formError }}</div><div class="hours-footer"><span><icon name="location" :size="15"></icon> Horário de São Paulo</span><button class="btn btn-primary" :disabled="busy">{{ busy ? 'Salvando…' : 'Salvar horários' }}<icon name="check" :size="17"></icon></button></div></form><aside class="care-note hours-note"><icon name="calendar" :size="30"></icon><h3>Um encontro<br>de cada vez.</h3><p>A agenda considera um atendimento por vez. Solicitações pendentes também reservam o horário.</p><p>Você pode alterar a rotina desde que os agendamentos existentes continuem dentro do novo período.</p><span class="care-note-bottom">Organização que vira cuidado.</span></aside></div></template>
 
-        <template v-else-if="page === 'perfil'"><section class="page-heading"><div><span class="eyebrow">SEU CANTINHO</span><h1>Meu perfil</h1><p>Os detalhes de quem cuida com tanto amor.</p></div><button class="btn btn-outline" @click="logout" :disabled="busy"><icon name="logout" :size="17"></icon>Sair da conta</button></section><form class="panel profile-panel form-stack" @submit.prevent="saveProfile"><div class="profile-heading"><span class="user-avatar">{{ initials(user.nome) }}</span><div><h2>{{ user.nome }}</h2><span class="status-badge confirmado">{{ isAdmin ? 'Administrador' : 'Cliente Pataí' }}</span></div></div><label>Nome completo<input v-model="profileForm.nome" required minlength="2" maxlength="120" autocomplete="name"></label><label>E-mail<input :value="user.email" disabled type="email"></label><label>Celular com DDD<input v-model="profileForm.telefone" type="tel" maxlength="24" autocomplete="tel" placeholder="(11) 99999-9999"></label><p class="muted profile-note">Seu contato ajuda nossa equipe a combinar os detalhes do cuidado.</p><div class="form-error" role="alert" v-if="formError">{{ formError }}</div><button class="btn btn-primary" :disabled="busy">{{ busy ? 'Salvando…' : 'Salvar alterações' }}<icon name="check" :size="17"></icon></button></form></template>
+        <template v-else-if="page === 'usuarios' && isAdmin">
+          <section class="page-heading">
+            <div><span class="eyebrow">QUEM FAZ PARTE DO PATAÍ</span><h1>Usuários</h1><p>Cadastre clientes e pessoas da equipe em um só lugar.</p></div>
+            <button class="btn btn-primary" @click="openUser"><icon name="plus" :size="18"></icon>Cadastrar usuário</button>
+          </section>
+          <section class="panel users-panel">
+            <div class="filter-bar"><div class="filter-tabs" aria-label="Filtrar usuários por perfil"><button v-for="option in userFilters" :key="option.value" :class="{active: userFilter === option.value}" @click="userFilter = option.value">{{ option.label }}<span>{{ option.count }}</span></button></div><span class="users-total">{{ filteredUsers.length }} {{ filteredUsers.length === 1 ? 'usuário' : 'usuários' }}</span></div>
+            <div class="table-scroll">
+              <table v-if="filteredUsers.length" class="data-table users-table">
+                <thead><tr><th>NOME</th><th>E-MAIL</th><th>CELULAR</th><th>PERFIL</th></tr></thead>
+                <tbody><tr v-for="account in filteredUsers" :key="account.id">
+                  <td><div class="table-user"><span class="user-avatar">{{ initials(account.nome) }}</span><span><strong>{{ account.nome }}</strong><small v-if="account.id === user.id">Você</small></span></div></td>
+                  <td>{{ account.email }}</td><td>{{ account.telefone || 'Não informado' }}</td>
+                  <td><span :class="['role-badge', account.tipo]"><icon :name="account.tipo === 'admin' ? 'shield' : 'user'" :size="15"></icon>{{ account.tipo === 'admin' ? 'Administrador' : 'Cliente' }}</span></td>
+                </tr></tbody>
+              </table>
+              <div v-else class="empty-state"><icon name="users" :size="38"></icon><h2>Nenhum usuário encontrado.</h2><p>Experimente mudar a busca ou o filtro de perfil.</p><button class="text-btn" @click="search = ''; userFilter = 'todos'">Limpar filtros</button></div>
+            </div>
+          </section>
+        </template>
+
+        <template v-else-if="page === 'perfil'">
+          <section class="page-heading"><div><span class="eyebrow">SEU CANTINHO</span><h1>Meu perfil</h1><p>Atualize seus dados e mantenha seu acesso em dia.</p></div><button class="btn btn-outline" @click="logout" :disabled="busy"><icon name="logout" :size="17"></icon>Sair da conta</button></section>
+          <form class="panel profile-panel form-stack" @submit.prevent="saveProfile">
+            <div class="profile-heading"><span class="user-avatar">{{ initials(user.nome) }}</span><div><h2>{{ user.nome }}</h2><span class="status-badge confirmado">{{ isAdmin ? 'Administrador' : 'Cliente Pataí' }}</span></div></div>
+            <label>Nome completo<input v-model="profileForm.nome" required minlength="2" maxlength="120" autocomplete="name"></label>
+            <label>E-mail<input v-model="profileForm.email" required type="email" maxlength="190" autocomplete="email"><small class="field-hint">Use este e-mail para entrar na sua conta.</small></label>
+            <label>Celular com DDD<input v-model="profileForm.telefone" type="tel" maxlength="24" autocomplete="tel" placeholder="(11) 99999-9999"></label>
+            <div class="profile-password">
+              <button type="button" class="password-disclosure" @click="togglePasswordFields" :aria-expanded="passwordExpanded" aria-controls="profile-password-fields"><span><icon name="lock" :size="20"></icon>Alterar minha senha</span><icon name="down" :size="18" :class="{expanded: passwordExpanded}"></icon></button>
+              <div v-if="passwordExpanded" id="profile-password-fields" class="form-stack">
+                <p class="field-hint">Escolha uma nova senha com pelo menos 8 caracteres.</p>
+                <label>Nova senha<input v-model="profileForm.nova_senha" type="password" minlength="8" maxlength="128" autocomplete="new-password" :required="!!profileForm.confirmacao_senha" placeholder="Pelo menos 8 caracteres"></label>
+                <label>Confirmar nova senha<input v-model="profileForm.confirmacao_senha" type="password" minlength="8" maxlength="128" autocomplete="new-password" :required="!!profileForm.nova_senha" placeholder="Digite a nova senha novamente"></label>
+              </div>
+            </div>
+            <div v-if="credentialsChanged || passwordExpanded" class="profile-current-password"><label>Senha atual<input v-model="profileForm.senha_atual" type="password" :required="credentialsChanged" maxlength="128" autocomplete="current-password" placeholder="Confirme sua senha atual"></label><p class="field-hint">Confirme sua senha atual para salvar a alteração de e-mail ou senha.</p></div>
+            <div class="form-error" role="alert" v-if="formError">{{ formError }}</div>
+            <button class="btn btn-primary" :disabled="busy">{{ busy ? 'Salvando…' : 'Salvar alterações' }}<icon name="check" :size="17"></icon></button>
+          </form>
+        </template>
+
 
         <footer class="page-footer"><span>Pataí<span class="brand-dot">.</span> <span class="footer-tagline">cuidado de focinho a rabinho</span></span><span>Feito de cuidado. E de muito amor. <icon name="heart" :size="13"></icon></span></footer>
       </main>
@@ -120,6 +160,17 @@
       <div class="gentle-note"><icon name="heart" :size="17"></icon>Essas informações ajudam a deixar o cuidado ainda mais especial.</div>
       <div v-if="formError" class="form-error" role="alert">{{ formError }}</div>
       <div class="modal-actions"><button type="button" class="btn btn-outline" @click="closeModal" :disabled="busy">Voltar</button><button class="btn btn-primary" :disabled="busy || !!animalPhotoError">{{ busy ? 'Salvando…' : modal.item ? 'Salvar alterações' : 'Cadastrar meu animal' }}<icon name="check" :size="17"></icon></button></div>
+    </form>
+
+    <form v-else-if="modal.type === 'usuario'" class="form-stack" @submit.prevent="saveUser">
+      <label>Nome completo<input v-model="userForm.nome" required minlength="2" maxlength="120" autocomplete="off" placeholder="Nome do cliente ou administrador"></label>
+      <label>E-mail<input v-model="userForm.email" required type="email" maxlength="190" autocomplete="off" placeholder="nome@exemplo.com"></label>
+      <div class="form-columns"><label>Celular com DDD <span class="optional">(opcional)</span><input v-model="userForm.telefone" type="tel" maxlength="24" autocomplete="off" placeholder="(11) 99999-9999"></label><label>Perfil de acesso<select v-model="userForm.tipo" required><option value="cliente">Cliente</option><option value="admin">Administrador</option></select></label></div>
+      <div class="gentle-note"><icon :name="userForm.tipo === 'admin' ? 'shield' : 'user'" :size="19"></icon>{{ userForm.tipo === 'admin' ? 'Administradores podem gerenciar a agenda, os serviços e os usuários do estabelecimento.' : 'Clientes podem cadastrar seus animais e solicitar agendamentos.' }}</div>
+      <label>Senha inicial<input v-model="userForm.senha" type="password" minlength="8" maxlength="128" required autocomplete="new-password" placeholder="Pelo menos 8 caracteres"></label>
+      <label>Confirmar senha inicial<input v-model="userForm.confirmacao_senha" type="password" minlength="8" maxlength="128" required autocomplete="new-password" placeholder="Digite a senha inicial novamente"></label>
+      <div v-if="formError" class="form-error" role="alert">{{ formError }}</div>
+      <div class="modal-actions"><button type="button" class="btn btn-outline" @click="closeModal" :disabled="busy">Voltar</button><button class="btn btn-primary" :disabled="busy">{{ busy ? 'Cadastrando…' : 'Cadastrar usuário' }}<icon name="check" :size="17"></icon></button></div>
     </form>
 
     <form v-else-if="modal.type === 'service'" class="form-stack" @submit.prevent="saveService"><label>Nome do serviço<input v-model="serviceForm.nome" required minlength="2" maxlength="100"></label><label>Descrição<textarea v-model="serviceForm.descricao" required minlength="5" maxlength="1000" rows="3"></textarea></label><div class="form-columns"><label>Valor (R$)<input v-model.number="serviceForm.preco" type="number" required min="0.01" max="10000" step="0.01"></label><label>Duração (minutos)<input v-model.number="serviceForm.duracao" type="number" required min="15" max="240" step="15"></label></div><div class="form-columns"><label>Ícone<select v-model="serviceForm.icone"><option value="bath">Banho</option><option value="scissors">Tesoura</option><option value="sparkles">Brilho</option><option value="heart">Coração</option></select></label><label>Disponibilidade<select v-model.number="serviceForm.ativo"><option :value="1">Ativo</option><option :value="0">Inativo</option></select></label></div><div v-if="formError" class="form-error" role="alert">{{ formError }}</div><div class="modal-actions"><button type="button" class="btn btn-outline" @click="closeModal" :disabled="busy">Voltar</button><button class="btn btn-primary" :disabled="busy">{{ busy ? 'Salvando…' : 'Salvar serviço' }}<icon name="check" :size="17"></icon></button></div></form>

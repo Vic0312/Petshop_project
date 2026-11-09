@@ -10,12 +10,14 @@ import { authController } from '../controllers/authController.js';
 import { petshopController } from '../controllers/petshopController.js';
 import { animalPhotoUpload } from '../middlewares/photoUpload.js';
 import { createPhotoStorage } from '../utils/photoStorage.js';
+import { usuarioController } from '../controllers/usuarioController.js';
 
 export function apiRoutes(db, options = {}) {
   const router = Router();
   const models = { usuarios: new UsuarioModel(db), animais: new AnimalModel(db), servicos: new ServicoModel(db), agendamentos: new AgendamentoModel(db), horarios: new HorarioModel(db), atendimentos: new AtendimentoModel(db) };
   const auth = createAuth(models.usuarios, options.secure);
   const account = authController(models.usuarios, auth), shop = petshopController(db, models, createPhotoStorage(options.uploadsDirectory));
+  const users = usuarioController(models.usuarios);
   router.use(sameOrigin);
   router.get('/config', (req, res) => res.json({ demo: options.demo ?? process.env.SEED_DEMO !== 'false', nome: 'Pataí' }));
   router.get('/servicos', async (req, res) => res.json(await models.servicos.list()));
@@ -25,8 +27,10 @@ export function apiRoutes(db, options = {}) {
   router.post('/auth/logout', jsonBody, (req, res) => { auth.destroy(req, res); res.json({ ok: true }); });
   router.use(auth.required);
   router.get('/auth/me', (req, res) => res.json(req.user));
-  router.put('/auth/perfil', jsonBody, account.profile);
+  router.put('/auth/perfil', jsonBody, authLimiter(), account.profile);
   router.get('/dashboard', shop.dashboard);
+  router.get('/usuarios', adminOnly, users.list);
+  router.post('/usuarios', adminOnly, jsonBody, users.create);
   router.get('/animais/fotos/:filename', shop.animalPhoto);
   router.post('/animais', animalPhotoUpload, shop.saveAnimal);
   router.put('/animais/:id', animalPhotoUpload, shop.saveAnimal);
