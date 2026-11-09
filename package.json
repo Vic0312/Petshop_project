@@ -1,0 +1,34 @@
+{
+  "name": "petshop_project",
+  "version": "1.0.0",
+  "description": "Pataí — cuidado de focinho a rabinho. Sistema MVC de banho e tosa.",
+  "homepage": "https://github.com/Vic0312/Petshop_project#readme",
+  "bugs": {
+    "url": "https://github.com/Vic0312/Petshop_project/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vic0312/Petshop_project.git"
+  },
+  "license": "ISC",
+  "author": "Maria Vitória e José Ricardo",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "node --test",
+    "check": "node utils/check.js",
+    "dev": "node --watch server.js",
+    "db:migrate": "node utils/migrate-sqlite.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "mongodb": "^7.8.0",
+    "multer": "^2.5.0",
+    "sharp": "^0.35.5",
+    "vue": "^3.5.45"
+  }
+}
